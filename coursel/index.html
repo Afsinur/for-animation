@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>coursel</title>
+
+    <link rel="stylesheet" href="./css/styles.css" />
+    <script src="./js/app.js" defer></script>
+  </head>
+  <body>
+    <div>
+      <style>
+        :root {
+          --same-width: 20rem;
+        }
+
+        .coursel-container {
+          border: 1px solid #acacac;
+          width: var(--same-width);
+          height: calc(var(--same-width) / 4);
+
+          overflow: hidden;
+        }
+
+        .coursel-slider {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+        }
+
+        .coursel-itm {
+          flex-shrink: 0;
+          height: var(--same-width);
+          text-align: center;
+
+          font-size: 4rem;
+        }
+
+        .btn-container {
+          z-index: -1;
+          visibility: hidden;
+        }
+      </style>
+
+      <div class="coursel-container">
+        <div class="coursel-slider">
+          <div id="last-itm-clone" class="coursel-itm">item-3</div>
+
+          <div class="coursel-itm">item-1</div>
+          <div class="coursel-itm">item-2</div>
+          <div class="coursel-itm">item-3</div>
+
+          <div id="first-itm-clone" class="coursel-itm">item-1</div>
+        </div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn btn-prv">Prev</button>
+        <button class="btn btn-nxt">Next</button>
+      </div>
+
+      <script>
+        const qs = (sl) => document.querySelectorAll(sl);
+        const css = (sl, obj) => Object.assign(sl.style, obj);
+        const on = (sl, e, f) => sl.addEventListener(e, f);
+        //
+        let translateDirection = "Y";
+        let setIntervalTime = 2500;
+        let setTransitionTime = 800;
+        //coursel
+        const courselSlider = qs(".coursel-slider")[0];
+        const courselItms = qs(".coursel-slider > .coursel-itm");
+        //buttons
+        const btnPrv = qs(".btn-prv")[0];
+        const btnNxt = qs(".btn-nxt")[0];
+        //
+        let counter = 1;
+        const size =
+          translateDirection === "X"
+            ? courselItms[0].clientWidth
+            : courselItms[0].clientHeight;
+        //
+        css(courselSlider, {
+          transform: `translate${translateDirection}(-${size * counter}px)`,
+        });
+        //button-listeners
+        on(btnNxt, "click", () => {
+          counter++;
+          css(courselSlider, {
+            transition: `transform ${setTransitionTime}ms ease-in-out`,
+            transform: `translate${translateDirection}(-${size * counter}px)`,
+          });
+        });
+
+        on(btnPrv, "click", () => {
+          if (counter <= 0) return;
+
+          counter--;
+          css(courselSlider, {
+            transition: `transform ${setTransitionTime}ms ease-in-out`,
+            transform: `translate${translateDirection}(-${size * counter}px)`,
+          });
+        });
+        //courselSlider-listener
+        on(courselSlider, "transitionend", () => {
+          if (courselItms[counter].id === "last-itm-clone") {
+            counter = courselItms.length - 2;
+            css(courselSlider, {
+              transition: `none`,
+              transform: `translate${translateDirection}(-${size * counter}px)`,
+            });
+          }
+
+          if (courselItms[counter].id === "first-itm-clone") {
+            counter = courselItms.length - counter;
+            css(courselSlider, {
+              transition: `none`,
+              transform: `translate${translateDirection}(-${size * counter}px)`,
+            });
+          }
+        });
+
+        setInterval(() => {
+          btnNxt.click();
+        }, setIntervalTime);
+      </script>
+    </div>
+  </body>
+</html>
