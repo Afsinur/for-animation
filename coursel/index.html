@@ -12,12 +12,17 @@
   <body>
     <div>
       <style>
+        body {
+          background-color: #363636;
+        }
+
         :root {
-          --same-width: 20rem;
+          --same-width: 35rem;
         }
 
         .coursel-container {
-          border: 1px solid #acacac;
+          margin: 10%;
+          /*border: 1px solid #acacac;*/
           width: var(--same-width);
           height: calc(var(--same-width) / 4);
 
@@ -35,24 +40,68 @@
           height: var(--same-width);
           text-align: center;
 
-          font-size: 4rem;
+          font-size: calc(var(--same-width) / 5);
+
+          display: flex;
         }
 
         .btn-container {
           z-index: -1;
           visibility: hidden;
         }
+
+        .coursel-itm.clr-1 > div {
+          background: -webkit-linear-gradient(
+            180deg,
+            rgba(49, 147, 34, 0.4) 61.32%,
+            rgba(0, 0, 0, 0.91) 100%
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .coursel-itm.clr-2 > div {
+          background: -webkit-linear-gradient(
+            180deg,
+            #8b8ac1 61.32%,
+            rgba(0, 0, 0, 0.91) 100%
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .coursel-itm.clr-3 > div {
+          background: -webkit-linear-gradient(
+            180deg,
+            #8ab1c1 61.32%,
+            rgba(0, 0, 0, 0.91) 100%
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes anim-letter {
+          0% {
+            transform: translateX(100px);
+          }
+          50% {
+            transform: translateX(50px);
+          }
+          100% {
+            transform: translateX(0);
+          }
+        }
       </style>
 
       <div class="coursel-container">
         <div class="coursel-slider">
-          <div id="last-itm-clone" class="coursel-itm">item-3</div>
+          <div id="last-itm-clone" class="coursel-itm clr-3"></div>
 
-          <div class="coursel-itm">item-1</div>
-          <div class="coursel-itm">item-2</div>
-          <div class="coursel-itm">item-3</div>
+          <div class="coursel-itm clr-1"></div>
+          <div class="coursel-itm clr-2"></div>
+          <div class="coursel-itm clr-3"></div>
 
-          <div id="first-itm-clone" class="coursel-itm">item-1</div>
+          <div id="first-itm-clone" class="coursel-itm clr-1"></div>
         </div>
       </div>
 
@@ -62,69 +111,127 @@
       </div>
 
       <script>
-        const qs = (sl) => document.querySelectorAll(sl);
-        const css = (sl, obj) => Object.assign(sl.style, obj);
-        const on = (sl, e, f) => sl.addEventListener(e, f);
-        //
-        let translateDirection = "Y";
-        let setIntervalTime = 2500;
-        let setTransitionTime = 800;
-        //coursel
-        const courselSlider = qs(".coursel-slider")[0];
-        const courselItms = qs(".coursel-slider > .coursel-itm");
-        //buttons
-        const btnPrv = qs(".btn-prv")[0];
-        const btnNxt = qs(".btn-nxt")[0];
-        //
-        let counter = 1;
-        const size =
-          translateDirection === "X"
-            ? courselItms[0].clientWidth
-            : courselItms[0].clientHeight;
-        //
-        css(courselSlider, {
-          transform: `translate${translateDirection}(-${size * counter}px)`,
-        });
-        //button-listeners
-        on(btnNxt, "click", () => {
-          counter++;
+        function initSplitting(arr, dir_, intTime_, trTime_) {
+          const qs = (sl) => document.querySelectorAll(sl);
+          const css = (sl, obj) => Object.assign(sl.style, obj);
+          const on = (sl, e, f) => sl.addEventListener(e, f);
+          //
+          let translateDirection = dir_;
+          let setIntervalTime = intTime_;
+          let setTransitionTime = trTime_;
+          let letterArr = arr;
+          //coursel
+          const courselSlider = qs(".coursel-slider")[0];
+          const courselItms = qs(".coursel-slider > .coursel-itm");
+          //buttons
+          const btnPrv = qs(".btn-prv")[0];
+          const btnNxt = qs(".btn-nxt")[0];
+          //
+          let counter = 1;
+          const size =
+            translateDirection === "X"
+              ? courselItms[0].clientWidth
+              : courselItms[0].clientHeight;
+          //
+          startSplitting();
+          //
           css(courselSlider, {
-            transition: `transform ${setTransitionTime}ms ease-in-out`,
             transform: `translate${translateDirection}(-${size * counter}px)`,
           });
-        });
-
-        on(btnPrv, "click", () => {
-          if (counter <= 0) return;
-
-          counter--;
-          css(courselSlider, {
-            transition: `transform ${setTransitionTime}ms ease-in-out`,
-            transform: `translate${translateDirection}(-${size * counter}px)`,
-          });
-        });
-        //courselSlider-listener
-        on(courselSlider, "transitionend", () => {
-          if (courselItms[counter].id === "last-itm-clone") {
-            counter = courselItms.length - 2;
+          //button-listeners
+          on(btnNxt, "click", () => {
+            counter++;
             css(courselSlider, {
-              transition: `none`,
+              transition: `transform ${setTransitionTime}ms ease-in-out`,
               transform: `translate${translateDirection}(-${size * counter}px)`,
+            });
+          });
+
+          on(btnPrv, "click", () => {
+            if (counter <= 0) return;
+
+            counter--;
+            css(courselSlider, {
+              transition: `transform ${setTransitionTime}ms ease-in-out`,
+              transform: `translate${translateDirection}(-${size * counter}px)`,
+            });
+          });
+          //courselSlider-listener
+          on(courselSlider, "transitionend", () => {
+            if (courselItms[counter].id === "last-itm-clone") {
+              counter = courselItms.length - 2;
+              css(courselSlider, {
+                transition: `none`,
+                transform: `translate${translateDirection}(-${
+                  size * counter
+                }px)`,
+              });
+            }
+            //
+            if (courselItms[counter].id === "first-itm-clone") {
+              counter = courselItms.length - counter;
+              css(courselSlider, {
+                transition: `none`,
+                transform: `translate${translateDirection}(-${
+                  size * counter
+                }px)`,
+              });
+            }
+            //
+            startSplitting();
+          });
+
+          function startSplitting() {
+            let splitArr = letterArr[counter]
+              .split("")
+              .map((itm, i) => {
+                return `<div>${itm}</div>`;
+              })
+              .join("");
+            courselItms[counter].innerHTML = splitArr;
+            courselItms[counter + 1].innerHTML = "";
+
+            cssJs(courselItms[counter].children);
+          }
+
+          function cssJs(arr) {
+            Array.from(arr).forEach((itm, i) => {
+              css(itm, {
+                transform: `translate${translateDirection}(-10000px)`,
+
+                "animation-name": `anim-letter`,
+                "animation-duration": `250ms`,
+                "animation-delay": `${i * 100}ms`,
+
+                "animation-timing-function": `ease-in-out`,
+                "animation-iteration-count": `1`,
+                "animation-fill-mode": `forwards`,
+              });
+            });
+
+            let totalWidth = Array.from(courselItms[counter].children).reduce(
+              (a, itm) => {
+                return (a += itm.clientWidth);
+              },
+              0
+            );
+
+            css(qs(".coursel-container")[0], {
+              width: `${totalWidth}px`,
             });
           }
 
-          if (courselItms[counter].id === "first-itm-clone") {
-            counter = courselItms.length - counter;
-            css(courselSlider, {
-              transition: `none`,
-              transform: `translate${translateDirection}(-${size * counter}px)`,
-            });
-          }
-        });
+          setInterval(() => {
+            btnNxt.click();
+          }, setIntervalTime);
+        }
 
-        setInterval(() => {
-          btnNxt.click();
-        }, setIntervalTime);
+        initSplitting(
+          ["Crypto", "ESG", "Real estate", "Crypto", "ESG"], //texts as html
+          "Y", //slide direction
+          4000, //set interval time
+          1000 //transition time
+        );
       </script>
     </div>
   </body>
